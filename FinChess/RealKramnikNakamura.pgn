@@ -1,0 +1,51 @@
+[Event "6th London Classic 2014"]
+[Site "London ENG"]
+[Date "2014.12.11"]
+[Round "2"]
+[White "Kramnik, V."]
+[Black "Nakamura, Hi"]
+[Result "1-0"]
+[ECO "E92"]
+[WhiteElo "2769"]
+[BlackElo "2775"]
+[PlyCount "81"]
+[EventDate "2014.12.10"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Be2 O-O 6. Nf3 e5 7. d5 {Die
+ruhigere Petrosian-Variante.} ({In einer früheren Königsindisch-Partie
+zwischen den beiden Spielern geschah.} 7. O-O Nc6 8. d5 Ne7 9. b4 (9. Nd2 a5
+10. a3 Kh8 11. Rb1 Nd7 {0-1 (45) Kramnik,V (2785)-Nakamura,H (2774) Monte
+Carlo 2011}) 9... Nh5 10. c5 Nf4 11. a4 f5 12. Bc4 fxe4 13. Nxe4 h6 14. Re1 Bg4
+15. Ra3 g5 16. h3 Bh5 17. Bxf4 Rxf4 18. g3 Rf8 19. a5 Kh8 20. Kg2 Rb8 21. Qd2
+b6 22. axb6 axb6 23. Nfxg5 hxg5 24. Qxg5 Bg6 25. cxd6 cxd6 26. Ra7 Rc8 27. Rxe7
+Rxc4 28. f3 Rc2+ 29. Kg1 Rc8 30. Ra1 Rf7 31. Qxg6 Qxe7 32. Ng5 Kg8 33. Qh7+ Kf8
+34. Ne6+ Ke8 35. Qh5 Bf6 36. g4 Qb7 37. Rd1 Qa6 38. Qg6 Ke7 39. g5 Bh8 40. Re1
+Qa3 41. Nd4 Qxb4 42. Nf5+ Kf8 43. Rd1 Rc2 44. Nd4 exd4 45. Qxc2 Qc3 46. Qe4
+Qe3+ 47. Qxe3 dxe3 48. Kg2 Bc3 49. Kf1 Rxf3+ 50. Ke2 Rxh3 {0-1 (50) Kramnik,V 
+(2781)-Nakamura,H (2770) Dortmund 2011}) 7... a5 8. Bg5 h6 9. Be3 $5 ({
+Üblicher ist} 9. Bh4 Na6 10. Nd2 Qe8 {usw.}) 9... Ng4 10. Bd2 ({Gespielt
+wurde auch} 10. Bc1 f5 11. exf5 gxf5 12. g3 Na6 13. Nh4 Nc5 14. O-O Nf6 15. f4
+{1-0 (26) Zvjaginsev,V (2590)-Cvitan,O (2535) Vienna 1996}) 10... f5 11. h3 Nf6
+12. exf5 gxf5 13. Qc1 $1 {Das ist ein neuer Zug. Allerdings gibt es hier keine
+Vörgängerpartien auf GM-Niveau.} (13. O-O) 13... f4 (13... Kh7 $2 14. g4 $16
+{mit der Idee.} fxg4 15. hxg4 Nxg4 16. Ng5+ $18) 14. g3 $1 {Die Pointe von 12.
+Dc1. Das Spiel wird jetzt schnell ziemlich scharf.} e4 {Nakmura nimmt den
+Fehdehandschuh auf und hält dagegen.} (14... fxg3 15. fxg3 Kh7 16. g4 $16 {
+Der schwarze König steht unsicher.}) 15. Nh4 e3 16. fxe3 fxg3 (16... fxe3 17.
+Bxe3 Re8 {führt zu nichts für Schwarz. Weiß zieht einfach} 18. Bxh6) 17. Ng6
+Rf7 ({In Betracht kam} 17... g2 $5 18. Rg1 Bxh3 $13) 18. Qc2 Nfd7 {Die Partie
+beginnt hier schon zu Gunsten von Weiß zu kippen. Weiß ist besser entwickelt
+und der schwarze Königsflügel steht labil.} (18... Nh7 $5 {mit der Absicht}
+19. Rg1 (19. O-O-O) 19... Ng5 20. Rxg3 Na6 21. h4 $2 Bf5) 19. O-O-O Ne5 ({Auch
+nach} 19... Nc5 20. Rhf1 Rxf1 21. Rxf1 Bxh3 22. Rg1 {hat Schwarz Probleme:} Qg5
+23. Nf4 Bf5 24. e4 Bg6 (24... Bh7 25. Nh5 $18) 25. Nh5 Qh4 26. Nxg3 $16) 20.
+Rhf1 Rxf1 21. Rxf1 Bxh3 22. Rg1 Qf6 (22... g2 23. Nxe5 dxe5 24. Qg6 Ra6 25. Qg3
+$18) 23. Rxg3 Nxg6 24. Rxg6 Qf7 25. Rg3 Bf5 26. e4 Bg6 27. Bg4 Qf1+ 28. Nd1 Be5
+29. Bh3 Qf6 30. Rg1 $18 Kh7 31. Bf5 Bxf5 32. exf5 Nd7 {Entwicklung des
+Damenflügelspringers im 32.Zug!} (32... Qf8 33. f6+ Kh8 34. Rg7 $18 (34. Qg6
+Nd7 35. Rh1 {nebst Matt.} )) 33. Rg6 {Die schwarze Stellung fällt nun
+auseinander.} Qf7 34. Rxh6+ Kg8 35. Rg6+ Kf8 36. Nf2 b5 37. Ng4 bxc4 38. Qxc4
+Qxf5 39. Rg8+ {Noch eine kleine Kombi zum Schluss.} Ke7 (39... Kxg8 40. Nh6+)
+40. Bg5+ (40. Rxa8 $18) 40... Bf6 41. Qe2+ (41. Qe2+ Ne5 42. Bxf6+ Kd7 43. Qb5+
+Nc6 44. Qxc6#) 1-0
+

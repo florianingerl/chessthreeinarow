@@ -1,0 +1,5 @@
+Uncomment the necessary block in pom.xml and then run
+
+mvn install:install-file@put-raptorchess-in-local-mvn-repo
+
+Then comment it out again and run mvn clean install!

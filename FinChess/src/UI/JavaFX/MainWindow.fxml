@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.TabPane?>
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="UI.JavaFX.MainWindowController">
+	<top>
+		<MenuBar fx:id="menuBar">
+			<menus>
+				<Menu text="File">
+					<items>
+						<Menu text="Open">
+							<items>
+								<MenuItem text=".pgn database" />
+								<MenuItem text="polygloat openening book" />
+							</items>
+						</Menu>
+						<SeparatorMenuItem />
+						<MenuItem text="Save">
+						</MenuItem>
+						<SeparatorMenuItem />
+						<MenuItem text="Exit" onAction="#handleExitAction" />
+					</items>
+				</Menu>
+				<Menu text="Edit">
+					<items>
+						<MenuItem text="Undo" />
+						<MenuItem text="Redo" />
+					</items>
+				</Menu>
+				<Menu text="Game">
+					<items>
+						<MenuItem text="New game" />
+						<Menu text="Build position">
+							<items>
+								<MenuItem text="from a fen string" />
+								<MenuItem text="by hand" />
+							</items>
+						</Menu>
+					</items>
+				</Menu>
+				<Menu text="Engine">
+					<items>
+						<MenuItem text="Start engine" />
+						<MenuItem text="Force a move" />
+						<MenuItem text="Stop engine" />
+					</items>
+				</Menu>
+				<Menu text="Help">
+					<items>
+						<MenuItem text="About" onAction="#handleAboutAction" />
+					</items>
+				</Menu>
+			</menus>
+		</MenuBar>
+	</top>
+	<center>
+
+	</center>
+</BorderPane>
+

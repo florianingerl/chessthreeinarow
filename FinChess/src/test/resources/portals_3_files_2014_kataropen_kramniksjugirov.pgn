@@ -1,0 +1,65 @@
+[Event "Qatar Masters Open 2014"]
+[Site "Doha QAT"]
+[Date "2014.12.01"]
+[Round "6.2"]
+[White "Kramnik, Vladimir"]
+[Black "Sjugirov, Sanan"]
+[Result "1-0"]
+[ECO "A05"]
+[WhiteElo "2760"]
+[BlackElo "2673"]
+[Annotator "AS"]
+[PlyCount "49"]
+[EventDate "2014.11.26"]
+
+1. Nf3 Nf6 2. g3 d5 3. Bg2 c6 4. d3 Bg4 5. O-O Nbd7 6. Qe1 e5 7. e4 Bd6 (7...
+dxe4 8. dxe4 Bd6 9. Nbd2 O-O 10. h3 Bh5 11. Nc4 Bc7 12. a4 Re8 13. Nh4 Nc5 14.
+Nf5 Ne6 15. Be3 Nf4 16. f3 Nxg2 17. Kxg2 Bg6 18. Rd1 Nd5 19. Nh4 Nxe3+ 20. Qxe3
+Qe7 21. Qb3 Rab8 22. Rf2 Red8 23. Rxd8+ Bxd8 24. Rd2 Bc7 25. Rd3 Qe6 26. Qb4 b6
+27. b3 a6 28. Qd2 b5 29. Rd7 bxc4 30. Rxc7 cxb3 31. Rb7 Qc8 32. Rxb3 Rxb3 33.
+cxb3 f6 34. Qd6 Kf7 35. g4 Ke8 36. Kg3 Qb7 37. b4 Qc8 38. a5 Kf7 39. Ng2 h5 40.
+Ne3 hxg4 41. hxg4 Qe6 42. Qd3 Qc8 43. Qc4+ Kf8 44. Qc5+ Kg8 45. b5 axb5 46. Qb6
+Qf8 47. a6 Qb4 48. a7 Qe1+ 49. Kg2 Qd2+ 50. Kg1 {1-0 (50) Kramnik,V (2801)
+-Vitiugov,N (2712) Paris/St Petersburg 2013}) 8. h3 Bh5 9. Nh4 (9. exd5 Bxf3
+10. Bxf3 Nxd5 11. Nc3 Nxc3 12. bxc3 O-O 13. Rb1 Qc7 14. Bd2 f5 15. Qe2 Rae8 16.
+Bg2 Kh8 17. Qh5 Bc5 18. Bg5 Bb6 19. Rb4 Re6 20. Rh4 h6 21. d4 f4 22. gxf4 exd4
+23. Qg4 Rg6 24. Be4 Rxf4 25. Qxf4 Qxf4 26. Rxf4 Rxg5+ 27. Kh1 Nf6 28. cxd4 Bxd4
+29. Rd1 Bb6 30. Bf5 Kg8 31. c4 Bc7 32. Rf3 b5 33. cxb5 cxb5 34. Rb1 a6 35. Rc1
+Be5 36. Rc6 Kf7 37. Rxa6 Bd4 38. Rd6 Bc5 39. Rc6 Be7 40. Rc7 g6 41. Re3 {1-0 
+(41) Movsesian,S (2695)-Zontakh,A (2546) Loo 2013}) 9... O-O 10. g4 {Dieser
+Bauerngewinn ist riskant, aber Kramnik spielt inzwischen im Open-Modus.} (10.
+f4 exf4 11. gxf4 dxe4 12. dxe4 Nxe4 13. Bxe4 Re8 14. Nf5 Bc5+ 15. Kh2 Nf6 16.
+Qc3 Rxe4 17. Qxc5 Re2+ 18. Kg1 Qd7 19. Nc3 b6 20. Qc4 Qxf5 21. Nxe2 Qxh3 22.
+Qb3 Qxb3 23. axb3 Bxe2 24. Re1 Bf3 25. Re7 a6 26. c4 c5 27. Bd2 h5 28. Bc3 Ng4
+29. Rf1 Bc6 30. Rd1 Rc8 31. Be1 a5 32. Bh4 Nh6 33. Ra7 f6 34. Ra6 Nf5 35. Bf2
+Rb8 36. Bxc5 Bf3 37. Rxb6 Rc8 38. Rf1 Be4 39. Re1 Bf3 40. Rb5 h4 41. Bf2 g6 42.
+Rxa5 Kg7 43. Ra7+ Kh6 44. Rd7 Kh5 45. Kh2 Nh6 46. Rh7 Rd8 47. Re3 Bg4 48. Bxh4
+Rd2+ 49. Kg3 g5 50. fxg5 fxg5 51. Rxh6+ Kxh6 52. Kxg4 Rd4+ 53. Kg3 gxh4+ 54.
+Kh3 Kg5 55. c5 Kf4 56. Rc3 Ke5 57. c6 Rd8 58. b4 Rc8 59. b5 Kd6 60. b4 Kc7 61.
+Kxh4 Rh8+ 62. Kg3 {1-0 (62) Amin,B (2535)-Ganguly,S (2586) Abu Dhabi 2007})
+10... Bg6 11. g5 Nh5 12. exd5 cxd5 13. Nxg6 hxg6 14. Bxd5 {Für den
+Bauernverlust erhält Schwarz einiges Gegenspiel, oder?} Nf4 ({Auf} 14... Bc5 {
+folgt} 15. a4 {denn} Ng3 {funktioniert nicht:} 16. b4 Bb6 17. a5 Nxf1 18. axb6
+{und der Sf1 kommt nicht raus.}) 15. Bxf4 exf4 16. h4 Qc8 {Die Hauptdrohung
+ist nun Sb6 und Dh3. Am folgenden Scharmützel sind auf beiden Seiten die Dame
+und die beiden Leichtfiguren beteiligt.} (16... Nb6 17. Bg2 f3 18. Bxf3 Qc8 19.
+Bg2 Qg4 20. Qe4 Bf4 21. Nc3 Qxh4 22. Rfe1 Rab8 $44) 17. Qe4 {Droht auch etwas,
+auf b7 und g6.} Qxc2 ({Kritisch war} 17... Re8 {Oder:} 18. Bxb7 $5 (18. Qxg6
+Ne5 19. Qe4 Qg4+ 20. Qg2 Qxh4 21. Nd2 f3 22. Qg3 (22. Nxf3 $2 Nxf3+ 23. Bxf3
+Re5 $19) 22... Qd4 {Nun hängt der Ld5, der b2 ist angegriffen und es droht
+ein Abzug des Se5, falls der Ld5 zieht. Nach} 23. c4 Qxd3 24. Nxf3 Nxf3+ 25.
+Qxf3 Qxf3 26. Bxf3 Re5 27. Rfd1 Rxg5+ 28. Kf1 {sind die Chancen gleich.}) 18...
+Qc7 (18... Rxe4 19. Bxc8 Re7 20. Bxd7 Rxd7 21. Nd2 $18) 19. Qc6 Rac8 20. Qxc7
+Rxc7 21. Bd5 Rxc2 22. Nc3 Nb6 23. Bb3 Rxb2 $14) 18. Nc3 Qxb2 (18... Nb6 19.
+Bxb7 Rae8 20. Qf3 Qxb2 21. d4 $13) 19. Qxg6 Bc5 (19... Qxc3 20. Qxd6 Rad8 (
+20... Ne5 21. Rac1 $14) 21. Rac1 $14) 20. Ne4 Qe5 ({Die weiße Absicht war} 
+20... -- 21. Qf5 Rad8 22. g6) 21. Bb3 {Weiß steht drohend und hat sich
+einigermaßen konsolidiert. Schwarz sah nun nicht, wie er die Dame auf g6
+abdrängen konnte und spielte} Bxf2+ $5 22. Nxf2 ({Nach} 22. Kxf2 Qb2+ 23. Kg1
+{plante Schwarz wohl} Qxb3 24. Qxg7+ Kxg7 25. axb3 $16 {aber Weiß steht
+aktiver, hat die bessere Struktur und einen Freibauern auf d3.}) 22... f3 {
+droht Matt.} 23. Ne4 Qd4+ $2 (23... Qb2 24. Rxf3 {mit der gleiche Wendung wie
+oben} Qxb3 25. Qxg7+ Kxg7 26. axb3 {aber einem Mehrbauern für Weiß.} Ne5 27.
+Rf6 Ng4 28. Rf4 Ne5) 24. Kh1 Qb2 25. Nf6+ (25. Nf6+ Nxf6 26. gxf6 {und die
+Dame deckt das Matt auf g2.}) 1-0
+
