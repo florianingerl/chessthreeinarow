@@ -28,6 +28,9 @@ public class BasicEngineTest {
 
 		engine.setPosition(getListOfMoves(new String[] { "Be4", "Rh7", "Nd4", "Rh8", "Rf1", "Rh7" }));
 
+		System.out.println(engine.getFenString());
+		assertFalse(engine.isCheckmate());
+		
 		engine.setDepth(3);
 		engine.findBestMove();
 		Move move = engine.getBestMove();
@@ -86,7 +89,7 @@ public class BasicEngineTest {
 	}
 
 	private List<Move> getListOfMoves(String[] movesInShortAlgebraicNotation) {
-		/*Position position = new Position();
+		Position position = new Position();
 
 		List<Move> moves = new LinkedList<Move>();
 
@@ -96,8 +99,7 @@ public class BasicEngineTest {
 			position.makeMove(move);
 		}
 
-		return moves;*/
-		return null;
+		return moves;
 	}
 
 }

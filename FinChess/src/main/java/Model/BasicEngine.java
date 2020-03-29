@@ -212,8 +212,11 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				if (interrupted && (bestMove != null)) {
 					return;
 				}
+				
+				
 
 				makeMove(currentSearch[i]);
+				System.out.println(currentSearch[i]);
 				
 				currentNode = currentNode.rightChild;
 				currentNode.value.setMoveInt(currentSearch[i].getMoveInt());
@@ -232,10 +235,18 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 				unmakeMove(currentSearch[i]);
 
+				if(currentSearch[i].toString().contentEquals("Tf1-f4")) {
+					System.out.println("The move Tf1-f4 has evaluation " + value);
+				}
+				if(value == BasicEngine.KING_VALUE) {
+					System.out.println("Checkmate was found");
+				}
 				if (value > best) {
 					if (value >= beta) {
 						System.out.println("Value >=beta at ply 0");
-						System.exit(1);
+					}
+					if(value == KING_VALUE) {
+						System.out.println("Checkmate wass found");
 					}
 					best = value;
 					if (value > alpha) {
@@ -257,7 +268,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			// a copy of currentSearch[i] where currentSearch[i] is always
 			// modified by the move Generator
 
-			if (best == -BasicEngine.KING_VALUE) {
+			if (best == BasicEngine.KING_VALUE) {
 				System.out.println("best was king value");
 				break outer;
 			} else if (value == BasicEngine.KING_VALUE - 1) {
@@ -272,6 +283,8 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	private int pvAlphaBeta(int ply, int depth, int alpha, int beta) {
 
+		if(isCheckmate())
+			return nextMove * BasicEngine.KING_VALUE;
 		++numberOfPvAlphaBetas;
 
 		// at the beginning, we are assuming no move exceeds alpha
@@ -595,8 +608,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	private int staticEvaluation() {
 		
-		if(isCheckmate())
-			return nextMove * KING_VALUE;
 		return 0;
 		/*int [] i = new int[3];
 		long l = whitePieces >> Long.numberOfTrailingZeros(whitePieces);
@@ -792,7 +803,11 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 	
 
 	private int pseudoLegalMoveGenerator(int index) {
-
+		
+		if(isCheckmate()) {
+			return index;
+		}
+		
 		move.clear();
 		freeSquares = ~occupiedSquares;
 
@@ -1367,6 +1382,8 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	private boolean isPseudoLegalMove(Move move) {
 
+		if(isCheckmate())
+			return false;
 		from = move.getFrom();
 		piece = move.getPiec();
 		to = move.getTosq();
