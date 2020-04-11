@@ -51,7 +51,71 @@ public class PositionTest {
 
 	}
 
+	private class PositionAndPossibleMoves {
+		String position;
+		int knightMoves;
+		int bishopMoves;
+		int rookMoves;
+		PositionAndPossibleMoves(String position, int knightMoves, int bishopMoves, int rookMoves){
+			this.position = position;
+			this.knightMoves = knightMoves;
+			this.bishopMoves = bishopMoves;
+			this.rookMoves = rookMoves;
+		}
+	}
 	
+	@Test
+	public void getLegalMoves_InVariousPositions_ReturnsTheCorrectNumberOfMovesOfEachPiece() {
+		List<PositionAndPossibleMoves> list = new LinkedList<PositionAndPossibleMoves>();
+		
+		list.add(new PositionAndPossibleMoves("wNc4Bd4Re2re5nd3bc3", 7, 6 , 10));
+		list.add(new PositionAndPossibleMoves("wNc4Rd4Bd2rd3nd5be5", 6,9,4));
+		list.add(new PositionAndPossibleMoves("wNd5Rd4Be4be5nf5rg7", 8,6,6));
+		list.add(new PositionAndPossibleMoves("wBc6Rd6Nd4bb4nd5re5", 7,6,6));
+		list.add(new PositionAndPossibleMoves("wRc4Nd4Bc3bd3rd2nf2", 8,4,6));
+		list.add(new PositionAndPossibleMoves("wRb5Bd5Ne4rc4nd4bc3", 7,6,9));
+		list.add(new PositionAndPossibleMoves("bRd4Bd5Nf5rc4bf4nf2", 6,11,9));
+		list.add(new PositionAndPossibleMoves("brd6bc4nd3Rc5Bd5Nc6", 7,4,6));
+		list.add(new PositionAndPossibleMoves("wBc3Ne4Re3bc4rd4nd2", 6,4,6));
+		list.add(new PositionAndPossibleMoves("bng5rb5ba6Bb4Nb2Rh3", 5,2,8));
+		list.add(new PositionAndPossibleMoves("brh4bg4nc6Rb4Nb2Bg8", 7,9,7));
+		list.add(new PositionAndPossibleMoves("bnd3bc5rh5Nc4Rd4Bc6", 7,7,11));
+		
+		list.add(new PositionAndPossibleMoves("wNb3Bb1Rh1nc4bd4rh8",5,7,11));
+		list.add(new PositionAndPossibleMoves("wNc2Bd4Rd5nc5bf4rh3",5,10,7));
+		list.add(new PositionAndPossibleMoves("bre3be4nc5Nc4Be5Rd6",7,13,9));
+		list.add(new PositionAndPossibleMoves("brd4bd3ne5Bd5Ne4Re3",7,7,3));
+		list.add(new PositionAndPossibleMoves("wRc5Bd5Nd4bb5ne5re4",7,9,7));
+		list.add(new PositionAndPossibleMoves("brd3nd5bf5Re4Ne1Bc3",7,7,7));
+		list.add(new PositionAndPossibleMoves("wRd6Bd5Nb5bc5rd4ne4",4,9,9));
+		list.add(new PositionAndPossibleMoves("brc5nc4bd4Rd5Bc3Ne2",8,7,5));
+		list.add(new PositionAndPossibleMoves("bre5nc4bb4Bb3Re4Ne6",7,9,7));
+		list.add(new PositionAndPossibleMoves("bre5nc4bb4Nb5Rd4Bb3",7,9,12));
+		list.add(new PositionAndPossibleMoves("brf4be4nd5Bd4Ne5Rd6",7,9,9));
+		list.add(new PositionAndPossibleMoves("wRc4Bd4Nd5bb4re4ne5",7,9,7));
+		
+		
+		for(PositionAndPossibleMoves pm : list) {
+			Position position = Position.fromPiecePlacements(pm.position);
+			List<Move> moves = position.getLegalMoves();
+			int knightMoves = 0;
+			int bishopMoves = 0;
+			int rookMoves = 0;
+			for(Move move : moves) {
+				if(move.getPiec() == Position.W_KNIGHT || move.getPiec() == Position.B_KNIGHT)
+					++knightMoves;
+				else if(move.getPiec() == Position.W_BISHOP || move.getPiec() == Position.B_BISHOP)
+					++bishopMoves;
+				else if(move.getPiec() == Position.W_ROOK || move.getPiec() == Position.B_ROOK)
+					++rookMoves;
+			}
+			System.out.println("Knight moves " + knightMoves);
+			
+			assertSame(pm.knightMoves, knightMoves );
+			assertSame(pm.bishopMoves, bishopMoves );
+			assertSame(pm.rookMoves, rookMoves );
+		}
+	}
 	
 	@Test
 	public void isCheckmate_InFoolsMatePosition_ReturnsTrue() {

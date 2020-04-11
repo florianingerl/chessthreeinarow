@@ -199,6 +199,8 @@ public class Position {
 			.compile("(?<nextMove>w|b)((?<piece>[pPnNbBrRqQkK])(?<square>[a-h][1-8])+)+");
 
 	public void setPositionFromPiecePlacements(String piecePlacements) {
+		initializeEmptyBoard();
+		
 		Matcher m = pPiecePlacements.matcher(piecePlacements);
 		m.setMode(Matcher.CAPTURE_TREE);
 		if (!m.matches()) {
@@ -1546,6 +1548,32 @@ public class Position {
 		return CalculateFenString.getFenString(this);
 	}
 
+	private void initializeEmptyBoard() {
+		whiteKnights = 0L;
+		blackKnights = 0L;
+
+		whiteBishops = 0L;
+		blackBishops = 0L;
+
+		whiteRooks = 0L;
+		blackRooks = 0L;
+
+		//whiteQueens = 8L;
+		//blackQueens = (8L) << (7 * 8);
+
+		setWhiteAndBlackPieces();
+		setOccupiedSquares();
+
+		for(int i=0; i < 64; ++i) {
+			square[i] = EMPTY;
+		}
+
+		
+		nextMove = 1; // white or black Move
+
+		endOfSearch = 0;
+	}
+	
 	public void reset() {
 
 		whiteKnights = 1L << (1+2*8);
@@ -1725,7 +1753,7 @@ public class Position {
 	}
 
 	public List<Move> getMovesOfPieceOn(int from) {
-		List<Move> moves = pseudoLegalMoveGenerator();
+		List<Move> moves = getLegalMoves();
 		List<Move> result = new LinkedList<Move>();
 
 		for (Move move : moves) {
@@ -1736,8 +1764,15 @@ public class Position {
 		return result;
 	}
 
-	public List<Move> pseudoLegalMoveGenerator() {
+	/**
+	 * 
+	 * @return null, if it's checkmate
+	 */
+	public List<Move> getLegalMoves() {
 
+		if(isCheckmate()) {
+			return null;
+		}
 		Move move = new Move();
 		long freeSquares = ~occupiedSquares;
 		long targetBitboard;

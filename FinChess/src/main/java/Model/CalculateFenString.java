@@ -59,7 +59,8 @@ public class CalculateFenString {
 		for (int row = 8; row >= 1; row--) {
 
 			for (int i = 8 * row - 8; i < 8 * row; i++) {
-				if (square[i] == BasicEngine.EMPTY) {
+				if (square[i] == Position.EMPTY) {
+					System.out.println("Square " + i + " is empty");
 					numberOfEmptySquares++;
 					continue;
 				} else if (numberOfEmptySquares > 0) {
@@ -67,6 +68,7 @@ public class CalculateFenString {
 					numberOfEmptySquares = 0;
 				}
 
+				System.out.println("On square " + i + " is a " + pieces.get(square[i]));
 				fenString.append(pieces.get(square[i]));
 
 			}

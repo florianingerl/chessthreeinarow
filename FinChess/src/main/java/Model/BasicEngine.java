@@ -18,6 +18,8 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	private static Logger logger = LogManager.getLogger();
 
+	private boolean pvSearch = false;
+
 	private Move bestMove = null;
 
 	private long timeOfSearch;
@@ -91,7 +93,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 		move.clear();
 		move.setPiec(W_KNIGHT);
 		move.setFrom(55);
-		//move.setCapt(EMPTY);
+		// move.setCapt(EMPTY);
 		move.setTosq(63);
 		for (i = 0; i < MAX_PLY; i++) {
 			killers[i][0] = new Killer();
@@ -111,7 +113,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			currentHash ^= Bitboards.ZOBRIST_HASH_RANDOMS[i];
 			currentHash2 ^= Bitboards.ZOBRIST_HASH_RANDOMS2[i];
 		}
-		
+
 		tempPiece = whiteKnights;
 		while (tempPiece != 0) {
 			from = Long.numberOfTrailingZeros(tempPiece);
@@ -133,8 +135,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			currentHash2 ^= Bitboards.ZOBRIST_HASH_RANDOMS2[W_ROOK * 64 + from];
 			tempPiece ^= Bitboards.BITSET[from];
 		}
-		
-		
+
 		tempPiece = blackKnights;
 
 		while (tempPiece != 0) {
@@ -162,10 +163,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	}
 
-	// the best move so far should be played or not
-	@Override
-	public void findBestMove() {
-
+	public void pvFindBestMove() {
 		interrupted = false;
 		this.numberOfPvAlphaBetas = 0;
 		this.numberOfPvAlphaBetaWithoutPvs = 0;
@@ -181,6 +179,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 		int ply = 0;
 		moveBufLen[ply] = 0;
+		// We assume it's not checkmate
 		moveBufLen[ply + 1] = pseudoLegalMoveGenerator(moveBufLen[ply]);
 
 		int value = -BasicEngine.KING_VALUE;
@@ -199,7 +198,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 			sortingDepth = currentDepth - 1;
 
-			System.out.println("There are  " + (moveBufLen[ply+1] - moveBufLen[ply]) + " many moves" );
+			System.out.println("There are  " + (moveBufLen[ply + 1] - moveBufLen[ply]) + " many moves");
 			Arrays.sort(currentSearch, moveBufLen[ply], moveBufLen[ply + 1], this);
 
 			best = -BasicEngine.KING_VALUE;
@@ -212,12 +211,10 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				if (interrupted && (bestMove != null)) {
 					return;
 				}
-				
-				
 
 				makeMove(currentSearch[i]);
 				System.out.println(currentSearch[i]);
-				
+
 				currentNode = currentNode.rightChild;
 				currentNode.value.setMoveInt(currentSearch[i].getMoveInt());
 
@@ -235,18 +232,24 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 				unmakeMove(currentSearch[i]);
 
-				if(currentSearch[i].toString().contentEquals("Tf1-f4")) {
+				if (currentSearch[i].toString().contentEquals("Tf1-f4")) {
 					System.out.println("The move Tf1-f4 has evaluation " + value);
 				}
-				if(value == BasicEngine.KING_VALUE) {
+				if (value == BasicEngine.KING_VALUE) {
 					System.out.println("Checkmate was found");
 				}
 				if (value > best) {
 					if (value >= beta) {
 						System.out.println("Value >=beta at ply 0");
+						System.exit(1);
 					}
-					if(value == KING_VALUE) {
+					if (value >= KING_VALUE - currentDepth) {
 						System.out.println("Checkmate wass found");
+						for (int k = 0; k <= currentDepth; ++k) {
+							if (value == KING_VALUE - k)
+								System.out.println("It's mate in " + k + " moves!");
+						}
+
 					}
 					best = value;
 					if (value > alpha) {
@@ -268,23 +271,128 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			// a copy of currentSearch[i] where currentSearch[i] is always
 			// modified by the move Generator
 
-			if (best == BasicEngine.KING_VALUE) {
-				System.out.println("best was king value");
+			if (best >= BasicEngine.KING_VALUE - currentDepth) {
 				break outer;
-			} else if (value == BasicEngine.KING_VALUE - 1) {
-				System.out.println("best was king value - 1");
-				break outer;
-			} else {
 			}
 
 		}
+	}
 
+	// the best move so far should be played or not
+	@Override
+	public void findBestMove() {
+		if (pvSearch)
+			pvFindBestMove();
+		else
+			normalFindBestMove();
 	}// end do in Background
 
-	private int pvAlphaBeta(int ply, int depth, int alpha, int beta) {
+	private void normalFindBestMove() {
 
-		if(isCheckmate())
-			return nextMove * BasicEngine.KING_VALUE;
+		interrupted = false;
+		this.numberOfPvAlphaBetas = 0;
+		this.numberOfPvAlphaBetaWithoutPvs = 0;
+		this.numberOfQuiescences = 0;
+		this.numberOfBetaCutoffs = 0;
+
+		this.transTable.clear();
+
+		currentNode = moveTree.root;
+
+		timeOfSearch = System.currentTimeMillis();
+		bestMove = null;
+
+		int ply = 0;
+		moveBufLen[ply] = 0;
+		// We assume it's not checkmate
+		moveBufLen[ply + 1] = pseudoLegalMoveGenerator(moveBufLen[ply]);
+
+		int value = -BasicEngine.KING_VALUE;
+
+		int alpha;
+		int beta;
+
+		int best;
+
+		// after each iteration drop moves that are not good
+		// how do you do this??
+
+		outer: for (int currentDepth = 3; currentDepth <= depth; ++currentDepth) {
+
+			sortingDepth = currentDepth - 1;
+
+			System.out.println("There are  " + (moveBufLen[ply + 1] - moveBufLen[ply]) + " many moves");
+			Arrays.sort(currentSearch, moveBufLen[ply], moveBufLen[ply + 1], this);
+
+			best = -BasicEngine.KING_VALUE;
+			alpha = -BasicEngine.KING_VALUE;
+			beta = BasicEngine.KING_VALUE;
+
+			for (int i = moveBufLen[ply]; i < moveBufLen[ply + 1]; ++i) {
+
+				if (interrupted && (bestMove != null)) {
+					return;
+				}
+
+				makeMove(currentSearch[i]);
+				System.out.println(currentSearch[i]);
+
+				currentNode = currentNode.rightChild;
+				currentNode.value.setMoveInt(currentSearch[i].getMoveInt());
+
+				value = -alphaBeta(ply + 1, currentDepth - 1, -beta, -alpha);
+
+				transTable.put(currentHash, currentHash2, value, currentDepth, lastNodeType);
+
+				unmakeMove(currentSearch[i]);
+
+				if (currentSearch[i].toString().contentEquals("Tf1-f4")) {
+					System.out.println("The move Tf1-f4 has evaluation " + value);
+				}
+				if (value == BasicEngine.KING_VALUE) {
+					System.out.println("Checkmate was found");
+				}
+				if (value > best) {
+					if (value >= beta) {
+						System.out.println("Value >=beta at ply 0");
+						System.exit(1);
+					}
+					if (value >= KING_VALUE - currentDepth) {
+						System.out.println("Checkmate wass found");
+						for (int k = 0; k <= currentDepth; ++k) {
+							if (value == KING_VALUE - k)
+								System.out.println("It's mate in " + k + " moves!");
+						}
+
+					}
+					best = value;
+					if (value > alpha) {
+						alpha = value;
+						currentNode.setPrincipalVariation();
+					}
+				} // end if value > best
+
+				currentNode = currentNode.father;
+
+			} // end iterating through first moves
+
+			bestMove = moveTree.getPrincipalMove();
+			// triangularArray[0][0]
+			// points to
+			// a copy of currentSearch[i] where currentSearch[i] is always
+			// modified by the move Generator
+
+			if (best >= BasicEngine.KING_VALUE - currentDepth) {
+				break outer;
+			}
+
+		}
+	}
+
+	private int alphaBeta(int ply, int depth, int alpha, int beta) {
+		if (isCheckmate()) {
+			return -BasicEngine.KING_VALUE + ply;
+		}
 		++numberOfPvAlphaBetas;
 
 		// at the beginning, we are assuming no move exceeds alpha
@@ -292,7 +400,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 		int nodeType = EvalNode.ALLNODE;
 
 		if (depth == 0) {
-			
+
 			// Nothing need to be set here, quiecence set lastNodeType correctly
 			return staticEvaluation();
 
@@ -301,83 +409,11 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 		int value;
 
 		int best = -BasicEngine.KING_VALUE;
-		boolean pvfound = false;
 
 		moveBufLen[ply + 1] = moveBufLen[ply];
 
-		for (int i = 0; i < 2; i++) {
-
-			// What node type is this???
-			if (interrupted && (bestMove != null)) {
-				return alpha + 1;
-			}
-
-			if (isPseudoLegalMove(killers[ply][i].getMove())) {
-
-				makeMove(killers[ply][i].getMove());
-
-				currentNode = currentNode.rightChild;
-
-				currentNode.value.setMoveInt(killers[ply][i].getMove().getMoveInt());
-
-				if (!positionRepeated()) {
-
-					/*
-					 * valueEvalNode = transTable.getEvaluation(currentHash,
-					 * currentHash2, depth); value = valueEvalNode.evaluation;
-					 * 
-					 * if (value == TranspositionTable.NOENTRY ||
-					 * (valueEvalNode.nodeType == EvalNode.CUTNODE && value >
-					 * beta) || (valueEvalNode.nodeType== EvalNode.ALLNODE &&
-					 * value < beta)) {
-					 */
-
-					if (pvfound) {
-						value = -pvAlphaBeta(ply + 1, depth - 1, -alpha - PAWN_VALUE, -alpha);
-						if (value > alpha && value < beta) {
-							value = -pvAlphaBeta(ply + 1, depth - 1, -beta, -value);
-						}
-
-					} else {
-						value = -pvAlphaBeta(ply + 1, depth - 1, -beta, -alpha);
-					}
-
-					transTable.put(currentHash, currentHash2, value, depth, lastNodeType);
-
-				} // End if position is not repeated
-				else {
-					// If position is repeated, then evaluation is 0
-					value = 0;
-				}
-
-				unmakeMove(killers[ply][i].getMove());
-
-				if (value > best) {
-					if (value >= beta) {
-						++numberOfBetaCutoffs;
-
-						lastNodeType = EvalNode.CUTNODE;
-						currentNode = currentNode.father;
-						return value;
-					}
-					best = value;
-					if (value > alpha) {
-						nodeType = EvalNode.PVNODE;
-						alpha = value;
-						pvfound = true;
-
-						currentNode.setPrincipalVariation();
-
-					} // end if value > alpha
-				} // end if value > best
-
-				currentNode = currentNode.father;
-			} // end if this killer is a pseudoLegalMove
-
-		} // end iterating through killers
-
 		if (interrupted && (bestMove != null)) {
-			return alpha + 1;
+			return alpha;
 		}
 
 		moveBufLen[ply + 1] = pseudoLegalMoveGenerator(moveBufLen[ply]);
@@ -388,19 +424,139 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 		for (int i = moveBufLen[ply]; i < moveBufLen[ply + 1]; i++) {
 
 			makeMove(currentSearch[i]);
-			
+
+			currentNode = currentNode.rightChild;
+			currentNode.value.setMoveInt(currentSearch[i].getMoveInt());
+
+			value = -alphaBeta(ply + 1, depth - 1, -beta, -alpha);
+
+			unmakeMove(currentSearch[i]);
+
+			if (value > best) {
+				best = value;
+				if (value >= beta) {
+					++numberOfBetaCutoffs;
+
+					lastNodeType = EvalNode.CUTNODE;
+					currentNode = currentNode.father;
+					addKiller(currentSearch[i], ply, value - Material());
+					return best;
+				}
+
+				if (value > alpha) {
+					nodeType = EvalNode.PVNODE;
+					addKiller(currentSearch[i], ply, value - Material());
+					alpha = value;
+
+					currentNode.setPrincipalVariation();
+
+				}
+			}
+
+			currentNode = currentNode.father;
+		}
+
+		lastNodeType = nodeType;
+		return best;
+	}
+
+	private int pvAlphaBeta(int ply, int depth, int alpha, int beta) {
+
+		if (isCheckmate()) {
+			return -BasicEngine.KING_VALUE + ply;
+		}
+		++numberOfPvAlphaBetas;
+
+		// at the beginning, we are assuming no move exceeds alpha
+		// lastNodeType needs to be a local variable here!!!
+		int nodeType = EvalNode.ALLNODE;
+
+		if (depth == 0) {
+
+			// Nothing need to be set here, quiecence set lastNodeType correctly
+			return staticEvaluation();
+
+		}
+
+		int value;
+
+		int best = alpha;
+		boolean pvfound = false;
+
+		moveBufLen[ply + 1] = moveBufLen[ply];
+
+		// We ignore killers for the moment
+		/*
+		 * for (int i = 0; i < 2; i++) {
+		 * 
+		 * // What node type is this??? if (interrupted && (bestMove != null)) { return
+		 * alpha + 1; }
+		 * 
+		 * if (isPseudoLegalMove(killers[ply][i].getMove())) {
+		 * 
+		 * makeMove(killers[ply][i].getMove());
+		 * 
+		 * currentNode = currentNode.rightChild;
+		 * 
+		 * currentNode.value.setMoveInt(killers[ply][i].getMove().getMoveInt());
+		 * 
+		 * if (!positionRepeated()) {
+		 * 
+		 * 
+		 * 
+		 * if (pvfound) { value = -pvAlphaBeta(ply + 1, depth - 1, -alpha - PAWN_VALUE,
+		 * -alpha); if (value > alpha && value < beta) { value = -pvAlphaBeta(ply + 1,
+		 * depth - 1, -beta, -value); }
+		 * 
+		 * } else { value = -pvAlphaBeta(ply + 1, depth - 1, -beta, -alpha); }
+		 * 
+		 * transTable.put(currentHash, currentHash2, value, depth, lastNodeType);
+		 * 
+		 * } // End if position is not repeated else { // If position is repeated, then
+		 * evaluation is 0 value = 0; }
+		 * 
+		 * unmakeMove(killers[ply][i].getMove());
+		 * 
+		 * if (value > best) { if (value >= beta) { ++numberOfBetaCutoffs;
+		 * 
+		 * lastNodeType = EvalNode.CUTNODE; currentNode = currentNode.father; return
+		 * value; } best = value; if (value > alpha) { nodeType = EvalNode.PVNODE; alpha
+		 * = value; pvfound = true;
+		 * 
+		 * currentNode.setPrincipalVariation();
+		 * 
+		 * } // end if value > alpha } // end if value > best
+		 * 
+		 * currentNode = currentNode.father; } // end if this killer is a
+		 * pseudoLegalMove
+		 * 
+		 * } // end iterating through killers
+		 */
+
+		if (interrupted && (bestMove != null)) {
+			return alpha;
+		}
+
+		moveBufLen[ply + 1] = pseudoLegalMoveGenerator(moveBufLen[ply]);
+		sortingDepth = depth - 1;
+
+		Arrays.sort(currentSearch, moveBufLen[ply], moveBufLen[ply + 1], this);
+
+		for (int i = moveBufLen[ply]; i < moveBufLen[ply + 1]; i++) {
+
+			makeMove(currentSearch[i]);
+
 			currentNode = currentNode.rightChild;
 			currentNode.value.setMoveInt(currentSearch[i].getMoveInt());
 
 			if (!positionRepeated()) {
 				/*
-				 * valueEvalNode = transTable.getEvaluation(currentHash,
-				 * currentHash2, depth); value = valueEvalNode.evaluation;
+				 * valueEvalNode = transTable.getEvaluation(currentHash, currentHash2, depth);
+				 * value = valueEvalNode.evaluation;
 				 * 
-				 * if (value == TranspositionTable.NOENTRY ||
-				 * (valueEvalNode.nodeType == EvalNode.CUTNODE && value > beta)
-				 * || (valueEvalNode.nodeType == EvalNode.ALLNODE && value <
-				 * beta)) {
+				 * if (value == TranspositionTable.NOENTRY || (valueEvalNode.nodeType ==
+				 * EvalNode.CUTNODE && value > beta) || (valueEvalNode.nodeType ==
+				 * EvalNode.ALLNODE && value < beta)) {
 				 */
 
 				if (pvfound) {
@@ -423,15 +579,16 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			unmakeMove(currentSearch[i]);
 
 			if (value > best) {
+				best = value;
 				if (value >= beta) {
 					++numberOfBetaCutoffs;
 
 					lastNodeType = EvalNode.CUTNODE;
 					currentNode = currentNode.father;
 					addKiller(currentSearch[i], ply, value - Material());
-					return value;
+					return best;
 				}
-				best = value;
+
 				if (value > alpha) {
 					nodeType = EvalNode.PVNODE;
 					addKiller(currentSearch[i], ply, value - Material());
@@ -444,10 +601,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			}
 
 			currentNode = currentNode.father;
-		}
-
-		if (best == -BasicEngine.KING_VALUE) {
-			best = 0;
 		}
 
 		lastNodeType = nodeType;
@@ -489,13 +642,12 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 				if (!positionRepeated()) {
 					/*
-					 * valueEvalNode = transTable.getEvaluation(currentHash,
-					 * currentHash2, depth); value = valueEvalNode.evaluation;
+					 * valueEvalNode = transTable.getEvaluation(currentHash, currentHash2, depth);
+					 * value = valueEvalNode.evaluation;
 					 * 
-					 * if (value == TranspositionTable.NOENTRY ||
-					 * (valueEvalNode.nodeType == EvalNode.CUTNODE && value >
-					 * best) || (valueEvalNode.nodeType == EvalNode.ALLNODE &&
-					 * value < beta)) {
+					 * if (value == TranspositionTable.NOENTRY || (valueEvalNode.nodeType ==
+					 * EvalNode.CUTNODE && value > best) || (valueEvalNode.nodeType ==
+					 * EvalNode.ALLNODE && value < beta)) {
 					 */
 
 					if (pvfound) {
@@ -552,12 +704,10 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 			if (!positionRepeated()) {
 				/*
-				 * valueEvalNode = transTable.getEvaluation(currentHash,
-				 * currentHash2, depth); value = valueEvalNode.evaluation; if
-				 * (value == TranspositionTable.NOENTRY ||
-				 * (valueEvalNode.nodeType == EvalNode.CUTNODE && value > best)
-				 * || (valueEvalNode.nodeType == EvalNode.ALLNODE && value <
-				 * beta)) {
+				 * valueEvalNode = transTable.getEvaluation(currentHash, currentHash2, depth);
+				 * value = valueEvalNode.evaluation; if (value == TranspositionTable.NOENTRY ||
+				 * (valueEvalNode.nodeType == EvalNode.CUTNODE && value > best) ||
+				 * (valueEvalNode.nodeType == EvalNode.ALLNODE && value < beta)) {
 				 */
 				if (pvfound) {
 					value = -pvAlphaBetaWithoutPv(ply + 1, depth - 1, -alpha - PAWN_VALUE, -alpha);
@@ -605,30 +755,23 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	}
 
-
 	private int staticEvaluation() {
-		
+
 		return 0;
-		/*int [] i = new int[3];
-		long l = whitePieces >> Long.numberOfTrailingZeros(whitePieces);
-		tempMove = l;
-		for(int j=0; j < 3; ++j) {
-			i[j] = Long.numberOfTrailingZeros(tempMove);
-			tempMove ^= Bitboards.BITSET[i[j]];
-		}
-		int w = i[0] + i[1] + i[2];
-		w += i[0] % 8 + i[1] % 8 + i[2] % 8;
-		
-		l = blackPieces >> Long.numberOfTrailingZeros(blackPieces);
-		tempMove = l;
-		for(int j=0; j < 3; ++j) {
-			i[j] = Long.numberOfLeadingZeros(tempMove);
-			tempMove ^= Bitboards.BITSET[i[j]];
-		}
-		int b = i[0] + i[1] + i[2];
-		b += i[0] % 8 + i[1] % 8 + i[2] % 8;
-		
-		return nextMove * (b-w)*100;*/
+		/*
+		 * int [] i = new int[3]; long l = whitePieces >>
+		 * Long.numberOfTrailingZeros(whitePieces); tempMove = l; for(int j=0; j < 3;
+		 * ++j) { i[j] = Long.numberOfTrailingZeros(tempMove); tempMove ^=
+		 * Bitboards.BITSET[i[j]]; } int w = i[0] + i[1] + i[2]; w += i[0] % 8 + i[1] %
+		 * 8 + i[2] % 8;
+		 * 
+		 * l = blackPieces >> Long.numberOfTrailingZeros(blackPieces); tempMove = l;
+		 * for(int j=0; j < 3; ++j) { i[j] = Long.numberOfLeadingZeros(tempMove);
+		 * tempMove ^= Bitboards.BITSET[i[j]]; } int b = i[0] + i[1] + i[2]; b += i[0] %
+		 * 8 + i[1] % 8 + i[2] % 8;
+		 * 
+		 * return nextMove * (b-w)*100;
+		 */
 	}
 
 	@Override
@@ -636,6 +779,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 		interrupted = true;
 	}
+
 	private int bonusBishops() {
 
 		return 0;
@@ -656,14 +800,11 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 		return nextMove * (whiteKnightEval - blackKnightEval);
 	}
 
-
 	private int rookBonus() {
 
 		return 0;
-	
 
 	}
-
 
 	public void makeMove(Move move)
 
@@ -679,7 +820,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 		currentHash ^= Bitboards.ZOBRIST_HASH_RANDOMS[Bitboards.HASH_BLACK_TO_MOVE];
 		currentHash2 ^= Bitboards.ZOBRIST_HASH_RANDOMS2[Bitboards.HASH_BLACK_TO_MOVE];
-
 
 		from = move.getFrom();
 		to = move.getTosq();
@@ -697,10 +837,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 		{
 
-		
-
-		
-
 		case W_KNIGHT: // white knight:
 
 			setWhiteKnights(getWhiteKnights() ^ fromToBitMap);
@@ -711,7 +847,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 			square[to] = W_KNIGHT;
 
-			
 			occupiedSquares ^= fromToBitMap;
 
 			break;
@@ -726,9 +861,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 			square[to] = W_BISHOP;
 
-			
-
-			
 			occupiedSquares ^= fromToBitMap;
 
 			break;
@@ -742,12 +874,11 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			square[from] = EMPTY;
 
 			square[to] = W_ROOK;
-			
+
 			occupiedSquares ^= fromToBitMap;
 
 			break;
 
-	
 		case B_KNIGHT: // black knight:
 
 			setBlackKnights(getBlackKnights() ^ fromToBitMap);
@@ -800,19 +931,17 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 		return nextMove * Material;
 	}
 
-	
-
 	private int pseudoLegalMoveGenerator(int index) {
-		
-		if(isCheckmate()) {
+
+		if (isCheckmate()) {
 			return index;
 		}
-		
+
 		move.clear();
 		freeSquares = ~occupiedSquares;
 
 		targetBitboard = ~occupiedSquares;
-		
+
 		if (nextMove == 1) {
 			move.setPiec(W_KNIGHT);
 
@@ -824,15 +953,13 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					currentSearch[index++].setMoveInt(move.getMoveInt());
 					tempMove ^= Bitboards.BITSET[to];
 				}
 				tempPiece ^= Bitboards.BITSET[from];
 
 			}
-
-			
 
 			move.setPiec(W_ROOK);
 			tempPiece = getWhiteRooks();
@@ -850,7 +977,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					currentSearch[index++].setMoveInt(move.getMoveInt());
 					tempMove ^= Bitboards.BITSET[to];
 
@@ -874,7 +1001,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					currentSearch[index++].setMoveInt(move.getMoveInt());
 					tempMove ^= Bitboards.BITSET[to];
 				}
@@ -894,7 +1021,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					currentSearch[index++].setMoveInt(move.getMoveInt());
 					tempMove ^= Bitboards.BITSET[to];
 				}
@@ -919,7 +1046,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 					to = Long.numberOfTrailingZeros(tempMove);
 
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					currentSearch[index++].setMoveInt(move.getMoveInt());
 					tempMove ^= Bitboards.BITSET[to];
 
@@ -927,8 +1054,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 				tempPiece ^= Bitboards.BITSET[from];
 			}
-
-			
 
 			move.setPiec(B_BISHOP);
 			tempPiece = getBlackBishops();
@@ -948,7 +1073,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					currentSearch[index++].setMoveInt(move.getMoveInt());
 					tempMove ^= Bitboards.BITSET[to];
 				}
@@ -962,7 +1087,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	}
 
-	
 	@Override
 	public void unmakeMove(Move move)
 
@@ -981,7 +1105,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 		{
 
-		
 		case W_KNIGHT: // white knight:
 
 			setWhiteKnights(getWhiteKnights() ^ fromToBitMap);
@@ -1024,7 +1147,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 			break;
 
-		
 		case B_KNIGHT: // black knight:
 
 			setBlackKnights(getBlackKnights() ^ fromToBitMap);
@@ -1067,7 +1189,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 			break;
 
-
 		}
 
 		endOfSearch--;
@@ -1105,12 +1226,12 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					list.add(new Move(move));
 					tempMove ^= Bitboards.BITSET[to];
 				}
 
-			} 
+			}
 
 			else if ("whiteRooks".equals(piece)) {
 
@@ -1129,14 +1250,13 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					list.add(new Move(move));
 					tempMove ^= Bitboards.BITSET[to];
 
 				}
 
 			}
-
 
 			else if ("whiteBishops".equals(piece)) {
 
@@ -1152,7 +1272,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				while (tempMove != 0) {
 					to = Long.numberOfTrailingZeros(tempMove);
 					move.setTosq(to);
-					//move.setCapt(square[to]);
+					// move.setCapt(square[to]);
 					list.add(new Move(move));
 					tempMove ^= Bitboards.BITSET[to];
 				}
@@ -1183,18 +1303,14 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 	private void setRedundantBittboardsAndStuff() {
 		currentHash = 0;
 
-		whitePieces =  whiteKnights | whiteBishops | whiteRooks ;
-		blackPieces =  blackKnights | blackBishops | blackRooks ;
+		whitePieces = whiteKnights | whiteBishops | whiteRooks;
+		blackPieces = blackKnights | blackBishops | blackRooks;
 		occupiedSquares = whitePieces | blackPieces;
-
-		
 
 		if (nextMove == -1) {
 			currentHash ^= Bitboards.ZOBRIST_HASH_RANDOMS[Bitboards.HASH_BLACK_TO_MOVE];
 			currentHash2 ^= Bitboards.ZOBRIST_HASH_RANDOMS2[Bitboards.HASH_BLACK_TO_MOVE];
 		}
-
-		
 
 		// Enpassent hash not beachtet so far
 
@@ -1231,7 +1347,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			Material += ROOK_VALUE;
 			tempPiece ^= Bitboards.BITSET[from];
 		}
-		
+
 		tempPiece = blackKnights;
 		while (tempPiece != 0) {
 			from = Long.numberOfTrailingZeros(tempPiece);
@@ -1270,7 +1386,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 		blackKnights = position.blackKnights;
 		blackBishops = position.blackBishops;
 		blackRooks = position.blackRooks;
-		
+
 		nextMove = position.nextMove; // white or black Move
 
 		endOfSearch = 0;
@@ -1366,7 +1482,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			case B_ROOK:
 				System.out.print("r ");
 				break;
-			
+
 			default:
 				;
 
@@ -1382,22 +1498,22 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	private boolean isPseudoLegalMove(Move move) {
 
-		if(isCheckmate())
+		if (isCheckmate())
 			return false;
 		from = move.getFrom();
 		piece = move.getPiec();
 		to = move.getTosq();
-		//captured = move.getCapt();
+		// captured = move.getCapt();
 
 		// quick check first!!
-		if (square[from] != piece ) {
+		if (square[from] != piece) {
 			return false;
 		}
 
 		if (nextMove == 1) {
 
 			switch (piece) {
-			
+
 			case W_KNIGHT:
 
 				return true;
@@ -1421,8 +1537,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 						& Bitboards.BITSET[to];
 				return (tempMove != 0);
 
-			
-
 			default:
 				return false;
 
@@ -1430,7 +1544,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 		} else {
 			switch (piece) {
-			
+
 			case B_KNIGHT:
 				return true;
 			case B_BISHOP:
@@ -1452,7 +1566,6 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 						& Bitboards.BITSET[to];
 				return (tempMove != 0);
 
-			
 			default:
 				return false;
 
@@ -1462,25 +1575,23 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	}
 
-
 	private boolean positionRepeated() {
 		return false;
-		
-		/*int fiftyMoveCopy = fiftyMove;
-		fiftyMoveCopy = fiftyMoveCopy - 2;
 
-		// The check for i >=0 is necessary, because we might not have gotten
-		// the initial position from
-		// the starting position plus a few moves
-
-		for (int i = endOfSearch - 2; fiftyMoveCopy >= 0 && i >= 0; i = i - 2, fiftyMoveCopy = fiftyMoveCopy - 2) {
-			if (gameLine[i].getHash() == currentHash) {
-				return true;
-			}
-
-		}
-
-		return false;*/
+		/*
+		 * int fiftyMoveCopy = fiftyMove; fiftyMoveCopy = fiftyMoveCopy - 2;
+		 * 
+		 * // The check for i >=0 is necessary, because we might not have gotten // the
+		 * initial position from // the starting position plus a few moves
+		 * 
+		 * for (int i = endOfSearch - 2; fiftyMoveCopy >= 0 && i >= 0; i = i - 2,
+		 * fiftyMoveCopy = fiftyMoveCopy - 2) { if (gameLine[i].getHash() ==
+		 * currentHash) { return true; }
+		 * 
+		 * }
+		 * 
+		 * return false;
+		 */
 	}
 
 	@Override
