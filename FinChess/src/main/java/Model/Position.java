@@ -1591,6 +1591,9 @@ public class Position {
 		setWhiteAndBlackPieces();
 		setOccupiedSquares();
 
+		for(int i=0; i < 64; ++i) {
+			square[i] = EMPTY;
+		}
 		square[1+2*8] = W_KNIGHT;
 		square[6+1*8] = W_BISHOP;
 		square[7] = W_ROOK;

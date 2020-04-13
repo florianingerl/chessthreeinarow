@@ -41,7 +41,7 @@ public class PgnGame {
 	{
 		if(fenString != null)
 		{
-			return Position.fromFenString(fenString);
+			return Position.fromPiecePlacements(fenString);
 		}
 		return new Position();
 	}

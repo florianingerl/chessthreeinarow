@@ -114,7 +114,11 @@ public class ChessboardDisplay extends JFrame
 
 	private JMenuBar menuBar = new JMenuBar();
 
-	private JMenu file = new JMenu("File");
+	private JMenu file = new JMenu("File") {
+		{
+			setVisible(false);
+		}
+	};
 
 	private JMenuItem openPgn = new JMenuItem("Open .pgn") {
 		{
@@ -135,7 +139,11 @@ public class ChessboardDisplay extends JFrame
 
 	private JMenuItem print = new JMenuItem("Print");
 
-	private JMenu edit = new JMenu("Edit");
+	private JMenu edit = new JMenu("Edit") {
+		{
+			setVisible(false);
+		}
+	};
 
 	private JMenuItem undo = new JMenuItem("Undo");
 	private JMenuItem redo = new JMenuItem("Redo");
@@ -154,6 +162,7 @@ public class ChessboardDisplay extends JFrame
 	};
 	private JMenuItem loadUCIEngine = new JMenuItem("Load UCI Engine!") {
 		{
+			setVisible(false);
 			setToolTipText("Load an UCI (Universal chess interface) engine!");
 		}
 	};
@@ -163,7 +172,7 @@ public class ChessboardDisplay extends JFrame
 		}
 	};
 
-	private JMenuItem buildPositionFromFen = new JMenuItem("from a fen string") {
+	private JMenuItem buildPositionFromString = new JMenuItem("from a string") {
 		{
 			setToolTipText("Build a position by providing a fen string");
 		}
@@ -171,6 +180,7 @@ public class ChessboardDisplay extends JFrame
 
 	private JMenuItem buildPositionByHand = new JMenuItem("by hand") {
 		{
+			setVisible(false);
 			setToolTipText("Build a position by dragging pieces onto the chess board");
 		}
 	};
@@ -178,7 +188,7 @@ public class ChessboardDisplay extends JFrame
 	private JMenu buildPosition = new JMenu("Build position") {
 		{
 			setToolTipText("Start a game from a position other than the starting position!");
-			add(buildPositionFromFen);
+			add(buildPositionFromString);
 			add(buildPositionByHand);
 		}
 	};
@@ -380,7 +390,7 @@ public class ChessboardDisplay extends JFrame
 
 		tabbedPane.add("Score sheet", new JScrollPane(sheet));
 
-		tabbedPane.add("book", new JScrollPane(tableOpeningBook));
+		//tabbedPane.add("book", new JScrollPane(tableOpeningBook));
 
 		tableOpeningBook.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableOpeningBook.getSelectionModel().addListSelectionListener(this);
@@ -583,7 +593,7 @@ public class ChessboardDisplay extends JFrame
 		startEngine.addActionListener(this);
 		stopEngine.addActionListener(this);
 		newGame.addActionListener(this);
-		buildPositionFromFen.addActionListener(this);
+		buildPositionFromString.addActionListener(this);
 		buildPositionByHand.addActionListener(this);
 		start.addActionListener(this);
 		back.addActionListener(this);
@@ -734,8 +744,8 @@ public class ChessboardDisplay extends JFrame
 
 		} else if (e.getSource() == buildPositionByHand) {
 			menuBuildPositionClicked();
-		} else if (e.getSource() == buildPositionFromFen) {
-			menuBuildPositionFromFenClicked();
+		} else if (e.getSource() == buildPositionFromString) {
+			menuBuildPositionFromStringClicked();
 		} else if (e.getSource() == start) {
 
 			buttonStartClicked();
@@ -779,8 +789,8 @@ public class ChessboardDisplay extends JFrame
 
 	}
 
-	private void menuBuildPositionFromFenClicked() {
-		String fenString = JOptionPane.showInputDialog("Please enter a valid fen string!");
+	private void menuBuildPositionFromStringClicked() {
+		String fenString = JOptionPane.showInputDialog("Please enter a valid string!\nThe first letter must be w or b meaning white or black is to move.\nThen follows for each peace the name of its square, e.g.\nwNb3Bd3Re4nc1rc2bg7 means\nWhite knight on b3, bishop on d3, rook e4\nand black knight on c1, rook c2 and bishop g7");
 		if (fenString == null)
 			return;
 
@@ -1148,9 +1158,11 @@ public class ChessboardDisplay extends JFrame
 	private void menuNewGameClicked() {
 		interruptPlayingThread();
 
+		System.out.println("Reseting position");
 		currentPosition.reset();
 		screen.redrawPosition();
 		screen.repaint();
+		System.out.println("Repainting finished!");
 
 		searchForOpeningMoves();
 		actuallyPlayedMoves = new VariationTree();
