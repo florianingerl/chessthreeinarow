@@ -281,6 +281,8 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 	// the best move so far should be played or not
 	@Override
 	public void findBestMove() {
+		if(isCheckmate())
+			return;
 		if (pvSearch)
 			pvFindBestMove();
 		else
@@ -341,7 +343,11 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				currentNode.value.setMoveInt(currentSearch[i].getMoveInt());
 
 				value = -alphaBeta(ply + 1, currentDepth - 1, -beta, -alpha);
-
+				if(value >= KING_VALUE - currentDepth) {
+					--value; //We need one move to reach the evaluation!
+				}
+				System.out.println( currentSearch[i].toString() + " has evaluation " + value );
+				
 				transTable.put(currentHash, currentHash2, value, currentDepth, lastNodeType);
 
 				unmakeMove(currentSearch[i]);
@@ -349,16 +355,14 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 				if (currentSearch[i].toString().contentEquals("Tf1-f4")) {
 					System.out.println("The move Tf1-f4 has evaluation " + value);
 				}
-				if (value == BasicEngine.KING_VALUE) {
-					System.out.println("Checkmate was found");
-				}
+				
 				if (value > best) {
 					if (value >= beta) {
 						System.out.println("Value >=beta at ply 0");
 						System.exit(1);
 					}
 					if (value >= KING_VALUE - currentDepth) {
-						System.out.println("Checkmate wass found");
+						System.out.println("Checkmate was found");
 						for (int k = 0; k <= currentDepth; ++k) {
 							if (value == KING_VALUE - k)
 								System.out.println("It's mate in " + k + " moves!");
@@ -391,7 +395,7 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 
 	private int alphaBeta(int ply, int depth, int alpha, int beta) {
 		if (isCheckmate()) {
-			return -BasicEngine.KING_VALUE + ply;
+			return -BasicEngine.KING_VALUE;
 		}
 		++numberOfPvAlphaBetas;
 
@@ -429,7 +433,10 @@ public class BasicEngine extends Position implements IEngine, Comparator<Move> {
 			currentNode.value.setMoveInt(currentSearch[i].getMoveInt());
 
 			value = -alphaBeta(ply + 1, depth - 1, -beta, -alpha);
-
+			if(value >= KING_VALUE - depth) {
+				--value; //We need one move to reach the evaluation
+			}
+			
 			unmakeMove(currentSearch[i]);
 
 			if (value > best) {

@@ -1737,18 +1737,21 @@ public class Position {
 		return move;
 	}
 
-	private static long checkmate1 = 1L + (1L << 1) + (1L << 2);
-	private static long checkmate2 = 1L + (1L << 8) + (1L << 16);
+	private static long checkmate1 = 1L | (1L << 1) | (1L << 2);
+	private static long checkmate2 = 1L | (1L << 8) | (1L << 16);
 			
 	public boolean isCheckmate() {
-		long l;
+		long pieces;
 		if (nextMove == -1) {
-			l = whitePieces >> Long.numberOfTrailingZeros(whitePieces);	
+			pieces = whitePieces;
 		}
 		else {
-			l = blackPieces >> Long.numberOfLeadingZeros(blackPieces);
+			pieces = blackPieces;
 		}
-		return l == checkmate1 || l == checkmate2;
+		long l = pieces >> Long.numberOfTrailingZeros(pieces);
+		if(l == checkmate2)
+			return true;
+		return l == checkmate1 && (Long.numberOfTrailingZeros(pieces)%8)<6;
 		
 	}
 

@@ -139,6 +139,18 @@ public class PositionTest {
 		parseAndMakeMoves(position, new String[] { "Be4", "Rh7", "Nd4", "Rh8", "Rf1", "Rh7", "Rf4" });
 		
 		assertTrue(position.isCheckmate());
+		
+		
+	}
+	
+	@Test
+	public void isCheckmate_InALotOfDifferentCheckmatePositions_ReturnsTrue() {
+		Position position = Position.fromPiecePlacements("wrd4bd3nd2Bc3Re3Nf2");
+		assertTrue(position.isCheckmate());
+		position = Position.fromPiecePlacements("wBd4Nc4Rd6nd3re3bf3");
+		assertTrue(position.isCheckmate());
+		position = Position.fromPiecePlacements("bRb4Bb3Nb2na5bg4rh4");
+		assertTrue(position.isCheckmate());
 	}
 	
 	@Test
